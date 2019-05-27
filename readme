@@ -1,0 +1,4 @@
+安装Nginx: sudo apt-get install nginx
+查看默认的配置文件路径: sudo nginx -t
+启动Nginx: sudo service nginx start
+停止Nginx: sudo service nginx stop
