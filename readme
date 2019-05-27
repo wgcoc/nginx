@@ -1,4 +1,23 @@
+方法1：
+参考: https://www.cnblogs.com/EasonJim/p/7806879.html
 安装Nginx: sudo apt-get install nginx
 查看默认的配置文件路径: sudo nginx -t
 启动Nginx: sudo service nginx start
 停止Nginx: sudo service nginx stop
+
+https://www.cnblogs.com/EasonJim/p/7806879.html
+
+
+安装PCRE: 
+	wget http://downloads.sourceforge.net/project/pcre/pcre/8.35/pcre-8.35.tar.gz
+	tar zxvf pcre-8.35.tar.gz
+	cd pcre-8.35
+	./configure
+	make && make install
+	pcre-config --version
+安装nginx:
+	wget http://nginx.org/download/nginx-1.6.2.tar.gz
+	tar zxvf nginx-1.6.2.tar.gz
+	cd nginx-1.6.2
+	./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-pcre=/usr/local/src/pcre-8.35
+	make && sudo make install
