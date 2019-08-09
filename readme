@@ -21,3 +21,62 @@ https://www.cnblogs.com/EasonJim/p/7806879.html
 	cd nginx-1.6.2
 	./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-pcre=/usr/local/src/pcre-8.35
 	make && sudo make install
+
+
+
+交叉编译:
+参考网址 https://blog.csdn.net/zbc415766331/article/details/77927718
+	http://www.cppblog.com/van201314/articles/165661.html
+1.准备软件包
+	a，nginx-1.12.1.tar.gz
+	b，pcre-8.30.tar.gz（不要下最新的pcre2-**.tar.gz）
+	c，zlib-1.2.11.tar.gz
+2.编写configure配置文件脚本nginx_configure.sh
+	#!/bin/sh
+
+	BUILD_PATH=/usr/local/nginx
+	CC_PATH=/usr/local/arm/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc
+	CPP_PATH=/usr/local/arm/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-g++
+
+	./configure \
+	  --prefix=$BUILD_PATH \
+	  --with-zlib=/home/wgco/software/zlib-1.2.3 \
+	  --with-pcre \
+	  --with-pcre=/home/wgco/software/pcre-8.35 \
+	  --with-pcre-jit \
+	  --with-cc=$CC_PATH \
+	  --with-cpp=$CPP_PATH
+
+3.修改auto/cc/name
+	if [ "$NGX_PLATFORM" != win32 ]; then
+	ngx_feature="C compiler"
+	ngx_feature_name=
+	#ngx_feature_run=yes
+	ngx_feature_run=no   ==>set to no to skip check
+	ngx_feature_incs=
+	ngx_feature_path=
+
+4.auto/types/sizeof
+	(1)ngx_test="$CC $CC_TEST_FLAGS $CC_AUX_FLAGS
+	   ==> ngx_test="gcc $CC_TEST_FLAGS $CC_AUX_FLAGS
+
+	(2)checking for $ngx_type size
+	  END
+	  ngx_size= ==> ngx_size=4
+
+5.auto/lib/pcre/make
+	./configure --disable-shared $PCRE_CONF_OPT 
+	==>./configure --disable-shared $PCRE_CONF_OPT --host=arm
+
+6.src/os/unix/ngx_errno.h
+	12行 #if (NGX_HAVE_ATOMIC_OPS) ==> #if (!NGX_HAVE_ATOMIC_OPS)
+
+7修改src/os/unix/ngx_shm.c，打开NGX_HAVE_MAP_ANON编译条件
+
+8.执行./nginx_configure.sh
+
+9. sudo make && make install
+
+10.拷贝到arm板子上，注意一定要在要和主机安装路径一致
+
+
